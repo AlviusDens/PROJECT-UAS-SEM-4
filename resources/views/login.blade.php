@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - QuickStart</title>
+    <title>Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -48,7 +48,7 @@
 
         .login-card {
             background-color: var(--bg-color);
-            padding:250px;
+            padding: 250px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             text-align: center;
@@ -182,12 +182,19 @@
             <h2>Log In to Your Account</h2>
             <p class="subtitle">Quickly access your dashboard and manage your projects.</p>
 
-            <form action="#" method="POST">
+            @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+            @endif
+
+            <form action="{{ url('/login') }}" method="POST">
+                @csrf
                 <div class="input-group">
                     <label for="email">Email Address</label>
                     <div class="input-wrapper">
                         <i class="fa-regular fa-envelope"></i>
-                        <input type="email" id="email" placeholder="Email Address">
+                        <input type="email" id="email" name="email" placeholder="Email Address" required>
                     </div>
                 </div>
 
@@ -198,12 +205,11 @@
                     </div>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-lock"></i>
-                        <input type="password" id="password" placeholder="Password">
+                        <input type="password" id="password" name="password" placeholder="Password" required>
                     </div>
                 </div>
 
-                    <a href="/home" class="btn btn-primary login-btn">Login</a>
-
+                <button type="submit" class="login-btn">Login</button>
             </form>
 
             <p class="signup-prompt">Don't have an account? <a href="#">Sign Up</a></p>
