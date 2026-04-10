@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -17,15 +18,25 @@ class AuthController extends Controller
         $email = $request->input('email');
         $password = $request->input('password');
 
-        // 2. Cek data (Tanpa Database - Hardcoded) 
-        if ($email == 'denis@email' && $password == 'email123') {
-            session(['is_logged_in' => true]);
-            // Jika benar, lempar ke dashboard
-            return redirect('/dashboard')->with('success', 'Selamat Datang Admin!');
-        }
+        // 2. Cek data  
+        $user = DB::table('pengguna')
+            ->where('email', $email)
+            ->where('password', $password)
+            ->first();
 
-        // 3. Jika salah, balikkan ke login dengan  pesan error
-        return back()->with('error', 'Email atau Password salah!');
+        if ($user) {
+            session(['login' => true]);
+            return redirect('/daftar_pengguna');
+        } else {
+            return redirect('/login')->with('error', 'Email atau password salah');
+        }
+    }
+
+    public function daftarPengguna()
+    {
+        $users = DB::table('pengguna')->get();
+
+        return view('daftar_pengguna', compact('users'));
     }
 
     public function logout()
@@ -33,6 +44,4 @@ class AuthController extends Controller
         session()->forget('is_logged_in'); // Hapus tanda login
         return redirect('/login')->with('success', 'Berhasil logout!');
     }
-
-    
 }

@@ -18,6 +18,8 @@ Route::get('login', [AuthController::class, 'index']);
 
 Route::post('/login', [AuthController::class, 'authenticate']);
 
+Route::get('/daftar_pengguna', [AuthController::class, 'daftarPengguna']);
+
 Route::middleware([CheckLogin::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
