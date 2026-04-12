@@ -14,29 +14,28 @@ class AuthController extends Controller
 
     public function authenticate(Request $request)
     {
-        // 1. Ambil data dari form
-        $email = $request->input('email');
+        // Kita anggap input dari form login namanya tetap 'email' atau bisa ganti jadi 'login_id'
+        $loginInput = $request->input('email');
         $password = $request->input('password');
 
-        // 2. Cek data  
-        $user = DB::table('pengguna')
-            ->where('email', $email)
+        // Cek data: Cari yang email-nya cocok ATAU nim-nya cocok
+        $user = DB::table('users')
+            ->where(function ($query) use ($loginInput) {
+                $query->where('email', $loginInput)
+                    ->orWhere('nim', $loginInput); // Menambahkan pengecekan NIM
+            })
             ->where('password', $password)
             ->first();
 
         if ($user) {
-            session(['login' => true]);
+            session(['is_logged_in' => true]);
+            session(['user_id' => $user->id]); // TAMBAHKAN INI
+            session(['user_nama' => $user->nama]);
+
             return redirect('/daftar_pengguna');
         } else {
-            return redirect('/login')->with('error', 'Email atau password salah');
+            return redirect('/login')->with('error', 'Email/NIM atau password salah');
         }
-    }
-
-    public function daftarPengguna()
-    {
-        $users = DB::table('pengguna')->get();
-
-        return view('daftar_pengguna', compact('users'));
     }
 
     public function logout()

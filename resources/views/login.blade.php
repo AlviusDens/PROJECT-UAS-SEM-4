@@ -136,6 +136,21 @@
             box-shadow: 0 0 0 3px rgba(59, 141, 161, 0.15);
         }
 
+        /* Ikon untuk toggle password */
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            /* Posisi di sebelah kanan */
+            cursor: pointer;
+            color: #a0aec0;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary-color);
+        }
+
         /* Tombol */
         .login-btn {
             width: 100%;
@@ -176,7 +191,6 @@
 </head>
 
 <body>
-
     <div class="login-container">
         <div class="login-card">
             <h2>Log In to Your Account</h2>
@@ -194,7 +208,7 @@
                     <label for="email">Email Address</label>
                     <div class="input-wrapper">
                         <i class="fa-regular fa-envelope"></i>
-                        <input type="email" id="email" name="email" placeholder="Email Address" required>
+                        <input type="text" id="email" name="email" placeholder="Email Or NIM" required>
                     </div>
                 </div>
 
@@ -206,15 +220,30 @@
                     <div class="input-wrapper">
                         <i class="fa-solid fa-lock"></i>
                         <input type="password" id="password" name="password" placeholder="Password" required>
+                        <i class="fa-solid fa-eye toggle-password" id="eyeIcon"></i>
                     </div>
                 </div>
-
                 <button type="submit" class="login-btn">Login</button>
             </form>
 
             <p class="signup-prompt">Don't have an account? <a href="#">Sign Up</a></p>
         </div>
     </div>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        eyeIcon.addEventListener('click', function() {
+            // Cek tipe input saat ini
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Ganti ikon mata (eye / eye-slash)
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 
 </body>
 

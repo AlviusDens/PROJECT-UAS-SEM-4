@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Index - QuickStart Bootstrap Template</title>
+    <title>Den Project</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
 
@@ -34,6 +34,52 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+    <style>
+        /* Membuat Navbar transparan dengan efek Blur (Glassmorphism) */
+        .header {
+            background: rgba(255, 255, 255, 0.8) !important;
+            /* Putih transparan */
+            backdrop-filter: blur(10px);
+            /* Efek blur kaca */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        /* Styling Profil ala GitHub */
+        .profile-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .profile-nav:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-nav span {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .profile-avatar {
+            width: 35px;
+            height: 35px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        /* Agar logo dan navmenu punya jarak yang pas */
+        .header .container-xl {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -41,42 +87,25 @@
     <header id="header" class="header d-flex align-items-center fixed-top">
         <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
-            <a href="index.html" class="logo d-flex align-items-center me-auto">
-                <img src="assets/img/logo.png" alt="">
-            </a>
-
-            <nav id="navmenu" class="navmenu">
+            <nav id="navmenu" class="navmenu me-4">
                 <ul>
-                    <li><a href="/home">Home</a></li>
-                    <li><a href="/dashboard">Dashboard</a></li>
-                    <li><a href="/cipher">Cipher</a></li>
-                    <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <ul>
-                            <li><a href="#">Dropdown 1</a></li>
-                            <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                <ul>
-                                    <li><a href="#">Deep Dropdown 1</a></li>
-                                    <li><a href="#">Deep Dropdown 2</a></li>
-                                    <li><a href="#">Deep Dropdown 3</a></li>
-                                    <li><a href="#">Deep Dropdown 4</a></li>
-                                    <li><a href="#">Deep Dropdown 5</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">Dropdown 2</a></li>
-                            <li><a href="#">Dropdown 3</a></li>
-                            <li><a href="#">Dropdown 4</a></li>
-                        </ul>
-                    </li>
-
-                    <li><a href="index.html#contact">None</a></li>
+                    <li><a href="/home" class="{{ Request::is('home') ? 'active' : '' }}">Home</a></li>
+                    <li><a href="/dashboard" class="{{ Request::is('dashboard') ? 'active' : '' }}">Dashboard</a></li>
+                    <li><a href="/daftar_pengguna" class="{{ Request::is('daftar_pengguna') ? 'active' : '' }}">Daftar Pengguna</a></li>
+                    <li><a href="/cipher" class="{{ Request::is('cipher') ? 'active' : '' }}">Cipher</a></li>
+                    <li><a href="/library" class="{{ Request::is('library') ? 'active' : '' }}">Library</a></li>
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
 
-            <div class="d-flex align-items-center ms-auto">
-                <span>Alvius Denis</span>
-                <img src="..." class="rounded-circle">
+            <div class="profile-nav">
+                <div class="d-none d-md-block text-end me-2">
+                    <span class="d-block">Alvius Denis</span>
+                </div>
+                <img src="{{ asset('quickstart/assets/img/Pas Foto 3x4.jpg') }}" alt="Profile" class="rounded-circle profile-avatar">
+                <i class="bi bi-caret-down-fill" style="font-size: 10px; color: #666;"></i>
             </div>
+
         </div>
     </header>
 
