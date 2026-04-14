@@ -42,4 +42,7 @@ Route::middleware([CheckLogin::class])->group(function () {
 
     Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
     Route::post('/library/borrow/{id}', [LibraryController::class, 'borrow'])->name('library.borrow');
+    Route::post('/library/store', [LibraryController::class, 'store'])->name('library.store');
+    Route::put('/library/update/{id}', [LibraryController::class, 'update'])->name('library.update');
+    Route::delete('/library/delete/{id}', [LibraryController::class, 'destroy'])->name('library.destroy');
 });
