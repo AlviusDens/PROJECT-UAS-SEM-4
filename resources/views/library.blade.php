@@ -8,13 +8,15 @@
         <h2 data-aos="fade-up" class="mb-1" style="font-size: 1.5rem;">Manajemen Perpustakaan</h2>
         <p data-aos="fade-up" data-aos-delay="100" class="mb-4 small text-muted">Temukan dan kelola koleksi buku dengan mudah.</p>
 
+        @if(session('user_role') == 'admin')
         <button type="button" class="btn btn-sm btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#addBookModal">
             <i class="bi bi-plus-circle"></i> Tambah Buku Baru
         </button>
+        @endif
     </div>
 </section>
 
-<!-- ini bagian isi -->
+<!-- ini bagian isi halamannya -->
 <section id="book-gallery" class="section" style="padding-top: 10px;">
     <div class="container">
         @if(session('success'))
@@ -36,14 +38,24 @@
                 <h5 class="fw-bold text-primary mb-0" style="letter-spacing: 1px;">{{ strtoupper($category) }}</h5>
             </div>
 
+            <!-- looping buku -->
             <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
                 @foreach($books as $book)
                 <div class="col" data-aos="fade-up">
                     <div class="card h-100 border-0 shadow-sm transition-hover" style="border-radius: 8px; overflow: hidden;">
                         <div class="position-absolute top-0 end-0 p-1" style="z-index: 2;">
-                            <span class="badge {{ $book->is_available ? 'bg-success' : 'bg-danger' }}" style="font-size: 0.6rem;">
-                                {{ $book->is_available ? 'Tersedia' : 'Terpinjam' }}
-                            </span>
+                            @php
+                            $currentLoan = $book->loans()->whereNull('returned_at')->first();
+                            $isLate = $currentLoan && \Carbon\Carbon::parse($currentLoan->due_date)->isPast();
+                            @endphp
+
+                            @if(!$book->is_available && $isLate)
+                            <span class="badge bg-dark" style="font-size: 0.6rem;">TERLAMBAT</span>
+                            @elseif(!$book->is_available)
+                            <span class="badge bg-danger" style="font-size: 0.6rem;">Terpinjam</span>
+                            @else
+                            <span class="badge bg-success" style="font-size: 0.6rem;">Tersedia</span>
+                            @endif
                         </div>
 
                         <div style="height: 180px; overflow: hidden; background: #eee;">
@@ -62,16 +74,22 @@
                                 @if($book->is_available)
                                 <button type="button" class="btn btn-xs btn-primary py-1" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#borrowModal{{ $book->id }}">Pinjam</button>
                                 @else
-                                <button class="btn btn-xs btn-secondary py-1" style="font-size: 0.75rem;" disabled>Terpinjam</button>
+                                <form action="{{ route('library.return', $book->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-xs btn-success py-1 w-100" onclick="return confirm('Konfirmasi pengembalian buku?')"> Kembalikan
+                                    </button>
+                                </form>
                                 @endif
 
                                 <div class="d-flex gap-1">
+                                    @if(session('user_role') == 'admin')
                                     <button type="button" class="btn btn-xs btn-outline-warning w-100 py-1" data-bs-toggle="modal" data-bs-target="#editBookModal{{ $book->id }}"><i class="bi bi-pencil" style="font-size: 0.7rem;"></i></button>
                                     <form action="{{ route('library.destroy', $book->id) }}" method="POST" class="w-100" onsubmit="return confirm('Hapus buku ini?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-xs btn-outline-danger w-100 py-1"><i class="bi bi-trash" style="font-size: 0.7rem;"></i></button>
                                     </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -106,6 +124,7 @@
                                             <option value="Romance" {{ $book->category == 'Romance' ? 'selected' : '' }}>Romance</option>
                                             <option value="Cryptography" {{ $book->category == 'Cryptography' ? 'selected' : '' }}>Cryptography</option>
                                             <option value="Sci-Fi" {{ $book->category == 'Sci-Fi' ? 'selected' : '' }}>Sci-Fi</option>
+                                            <option value="Rilis Baru" {{ $book->category == 'Rilis Baru' ? 'selected' : '' }}>Rilis Baru</option>
                                         </select>
                                     </div>
 
@@ -181,6 +200,7 @@
                             <option value="Romance">Romance</option>
                             <option value="Cryptography">Cryptography</option>
                             <option value="Sci-Fi">Sci-Fi</option>
+                            <option value="Rilis Baru">Rilis Baru</option>
                         </select>
                     </div>
 

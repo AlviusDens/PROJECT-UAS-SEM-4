@@ -10,19 +10,25 @@ class UserController extends Controller // Ubah sesuai nama file
 {
     public function daftarPengguna()
     {
+        if (session('user_role') !== 'admin') {
+            return redirect('/dashboard')->with('error', 'Hanya admin yang boleh melihat daftar pengguna.');
+        }
         // Gunakan huruf kecil untuk variabel agar standar Laravel ($users)
-        $users = Users::all(); 
+        $users = Users::all();
         return view('daftar_pengguna', compact('users'));
     }
 
     // Fungsi Tambah Data
     public function store(Request $request)
     {
+        if (session('user_role') !== 'admin') {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk tindakan ini.');
+        }
         // Validasi sederhana
         $data = $request->all();
-        
+
         // Penting: Hash password agar bisa login!
-        if($request->has('password')){
+        if ($request->has('password')) {
             $data['password'] = Hash::make($request->password);
         }
 
@@ -34,9 +40,9 @@ class UserController extends Controller // Ubah sesuai nama file
     public function update(Request $request, $id)
     {
         $user = Users::findOrFail($id); // Lebih aman pakai findOrFail
-        
+
         $data = $request->all();
-        if($request->filled('password')){
+        if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         } else {
             unset($data['password']); // Jangan update password jika kosong

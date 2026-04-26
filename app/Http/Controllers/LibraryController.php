@@ -23,6 +23,9 @@ class LibraryController extends Controller
     // Menambah Buku Baru
     public function store(Request $request)
     {
+        if (session('user_role') !== 'admin') {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk tindakan ini.');
+        }
         $request->validate([
             'title'    => 'required',
             'author'   => 'required',
@@ -105,5 +108,23 @@ class LibraryController extends Controller
         $book->update(['is_available' => false]);
 
         return redirect()->back()->with('success', 'Buku "' . $book->title . '" berhasil dipinjam!');
+    }
+
+    public function returnBook($id)
+    {
+        // 1. Cari data peminjaman yang sedang aktif untuk buku ini
+        $loan = Loan::where('book_id', $id)->whereNull('returned_at')->first();
+
+        if ($loan) {
+            // 2. Isi kolom returned_at dengan waktu sekarang
+            $loan->update(['returned_at' => now()]);
+
+            // 3. Ubah status buku menjadi tersedia kembali
+            $loan->book->update(['is_available' => true]);
+
+            return redirect()->back()->with('success', 'Buku berhasil dikembalikan!');
+        }
+
+        return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan.');
     }
 }

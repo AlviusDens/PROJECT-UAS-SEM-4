@@ -28,19 +28,23 @@ class AuthController extends Controller
             ->first();
 
         if ($user) {
-            session(['is_logged_in' => true]);
-            session(['user_id' => $user->id]); // TAMBAHKAN INI
-            session(['user_nama' => $user->nama]);
-
-            return redirect('/daftar_pengguna');
+            session([
+                'is_logged_in' => true,
+                'user_id'      => $user->id,
+                'user_nama'    => $user->nama,
+                'user_role'    => $user->role // Tambahkan ini
+            ]);
+            return redirect('/dashboard');
         } else {
             return redirect('/login')->with('error', 'Email/NIM atau password salah');
         }
     }
 
+    // Di AuthController.php
     public function logout()
     {
-        session()->forget('is_logged_in'); // Hapus tanda login
+        // Hapus semua data session terkait user
+        session()->flush();
         return redirect('/login')->with('success', 'Berhasil logout!');
     }
 }

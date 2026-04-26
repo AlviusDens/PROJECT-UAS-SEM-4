@@ -92,18 +92,25 @@
                     <li><a href="/home" class="{{ Request::is('home') ? 'active' : '' }}">Home</a></li>
                     <li><a href="/dashboard" class="{{ Request::is('dashboard') ? 'active' : '' }}">Dashboard</a></li>
                     <li><a href="/daftar_pengguna" class="{{ Request::is('daftar_pengguna') ? 'active' : '' }}">Daftar Pengguna</a></li>
-                    <li><a href="/cipher" class="{{ Request::is('cipher') ? 'active' : '' }}">Cipher</a></li>
                     <li><a href="/library" class="{{ Request::is('library') ? 'active' : '' }}">Library</a></li>
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
 
-            <div class="profile-nav">
-                <div class="d-none d-md-block text-end me-2">
-                    <span class="d-block">Alvius Denis</span>
+            <div class="d-flex align-items-center gap-3">
+                <div class="profile-nav d-flex align-items-center">
+                    <div class="d-none d-md-block text-end me-2">
+                        <span class="d-block fw-bold" style="font-size: 14px;">{{ session('user_nama') }}</span>
+                        <small class="text-muted" style="font-size: 11px;">{{ ucfirst(session('user_role')) }}</small>
+                    </div>
+                    <img src="..." alt="Profile" class="rounded-circle profile-avatar">
                 </div>
-                <img src="{{ asset('quickstart/assets/img/Pas Foto 3x4.jpg') }}" alt="Profile" class="rounded-circle profile-avatar">
-                <i class="bi bi-caret-down-fill" style="font-size: 10px; color: #666;"></i>
+
+                <a href="{{ route('logout') }}" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 shadow-sm"
+                    onclick="return confirm('Apakah Anda yakin ingin keluar?')">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span class="d-none d-sm-inline">Logout</span>
+                </a>
             </div>
 
         </div>

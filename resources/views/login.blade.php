@@ -48,7 +48,8 @@
 
         .login-card {
             background-color: var(--bg-color);
-            padding: 250px;
+            padding: 40px;
+            /* Diubah dari 250px agar lebih proporsional */
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             text-align: center;
@@ -118,15 +119,17 @@
             left: 16px;
             color: #a0aec0;
             font-size: 14px;
+            pointer-events: none;
+            /* Agar tidak menghalangi klik pada input */
         }
 
         .input-wrapper input {
             width: 100%;
-            padding: 12px 12px 12px 42px;
+            padding: 12px 42px 12px 42px;
+            /* Kiri 42px, Kanan 42px */
             border: 2px solid var(--input-border);
             border-radius: 8px;
             font-size: 14px;
-            font-family: var(--font-family);
             outline: none;
             transition: all 0.3s ease;
         }
@@ -138,13 +141,13 @@
 
         /* Ikon untuk toggle password */
         .toggle-password {
-            position: absolute;
+            left: auto !important;
+            /* Membatalkan pengaturan left: 16px */
             right: 16px;
-            /* Posisi di sebelah kanan */
             cursor: pointer;
-            color: #a0aec0;
-            font-size: 14px;
             z-index: 10;
+            pointer-events: auto !important;
+            /* Harus bisa diklik */
         }
 
         .toggle-password:hover {
