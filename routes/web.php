@@ -24,9 +24,10 @@ Route::get('login', [AuthController::class, 'index']);
 
 Route::post('/login', [AuthController::class, 'authenticate']);
 
-Route::middleware([CheckLogin::class])->group(function () {
+Route::get('/register', [AuthController::class, 'showRegister']);
+Route::post('/register', [AuthController::class, 'register']);
 
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::middleware([CheckLogin::class])->group(function () {
 
     Route::get('/daftar_pengguna', [UserController::class, 'daftarPengguna']);
     Route::get('/daftar_pengguna', [UserController::class, 'daftarPengguna']);
@@ -35,7 +36,7 @@ Route::middleware([CheckLogin::class])->group(function () {
     Route::delete('/daftar_pengguna/delete/{id}', [UserController::class, 'destroy'])->name('pengguna.destroy');
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
-
+    Route::put('/dashboard/update', [DashboardController::class, 'updateProfile'])->name('dashboard.update');
 
     Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
     Route::post('/library/borrow/{id}', [LibraryController::class, 'borrow'])->name('library.borrow');
@@ -43,4 +44,6 @@ Route::middleware([CheckLogin::class])->group(function () {
     Route::put('/library/update/{id}', [LibraryController::class, 'update'])->name('library.update');
     Route::delete('/library/delete/{id}', [LibraryController::class, 'destroy'])->name('library.destroy');
     Route::post('/library/return/{id}', [LibraryController::class, 'returnBook'])->name('library.return');
+
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });

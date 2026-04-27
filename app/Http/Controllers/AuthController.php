@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Users;
 
 class AuthController extends Controller
 {
@@ -46,5 +47,36 @@ class AuthController extends Controller
         // Hapus semua data session terkait user
         session()->flush();
         return redirect('/login')->with('success', 'Berhasil logout!');
+    }
+
+    public function showRegister()
+    {
+        return view('register', ['title' => 'Sign Up']);
+    }
+
+    public function register(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'nim' => 'required|unique:users,nim',
+            'password' => 'required|min:6',
+            'jurusan' => 'required',
+            'semester' => 'required|integer',
+        ]);
+
+        // Simpan data ke tabel users
+        Users::create([
+            'nama' => $request->nama,
+            'email' => $request->email,
+            'nim' => $request->nim,
+            'password' => $request->password, 
+            'jurusan' => $request->jurusan,
+            'semester' => $request->semester,
+            'role' => 'mahasiswa' 
+        ]);
+
+        return redirect('/login')->with('success', 'Akun berhasil dibuat! Silakan login.');
     }
 }

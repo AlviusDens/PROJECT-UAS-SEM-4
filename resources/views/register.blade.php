@@ -4,15 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Sign Up - Den Project</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Variabel Warna Tema QuickStart */
         :root {
             --primary-color: #3b8da1;
-            /* Warna tombol utama */
             --primary-hover: #2d6b7a;
             --text-dark: #2d3748;
             --text-muted: #718096;
@@ -37,31 +35,29 @@
             align-items: center;
             min-height: 100vh;
             color: var(--text-dark);
+            padding: 40px 20px;
         }
 
-        /* Container Card Login */
         .login-container {
             width: 100%;
-            max-width: 900px;
-            padding: 20px;
+            max-width: 450px;
         }
+
+        /* Diperkecil lebarnya agar lebih pas untuk satu kolom */
 
         .login-card {
             background-color: var(--bg-color);
             padding: 40px;
-            /* Diubah dari 250px agar lebih proporsional */
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            text-align: center;
             border: 1px solid #edf2f7;
+            text-align: center;
         }
 
-        /* Tipografi */
         .login-card h2 {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: 700;
             margin-bottom: 8px;
-            color: var(--text-dark);
         }
 
         .subtitle {
@@ -70,13 +66,9 @@
             margin-bottom: 30px;
         }
 
-        /* Form & Input */
-        form {
-            text-align: left;
-        }
-
         .input-group {
             margin-bottom: 20px;
+            text-align: left;
         }
 
         .input-group label {
@@ -84,28 +76,6 @@
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 8px;
-            color: var(--text-dark);
-        }
-
-        .label-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .label-row label {
-            margin-bottom: 0;
-        }
-
-        .forgot-link {
-            font-size: 13px;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
         }
 
         .input-wrapper {
@@ -120,13 +90,11 @@
             color: #a0aec0;
             font-size: 14px;
             pointer-events: none;
-            /* Agar tidak menghalangi klik pada input */
         }
 
         .input-wrapper input {
             width: 100%;
-            padding: 12px 42px 12px 42px;
-            /* Kiri 42px, Kanan 42px */
+            padding: 12px 42px;
             border: 2px solid var(--input-border);
             border-radius: 8px;
             font-size: 14px;
@@ -139,22 +107,13 @@
             box-shadow: 0 0 0 3px rgba(59, 141, 161, 0.15);
         }
 
-        /* Ikon untuk toggle password */
         .toggle-password {
             left: auto !important;
-            /* Membatalkan pengaturan left: 16px */
             right: 16px;
             cursor: pointer;
-            z-index: 10;
             pointer-events: auto !important;
-            /* Harus bisa diklik */
         }
 
-        .toggle-password:hover {
-            color: var(--primary-color);
-        }
-
-        /* Tombol */
         .login-btn {
             width: 100%;
             padding: 14px;
@@ -165,16 +124,9 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
             margin-top: 10px;
-            font-family: var(--font-family);
         }
 
-        .login-btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        /* Teks Bawah */
         .signup-prompt {
             margin-top: 25px;
             font-size: 14px;
@@ -186,50 +138,70 @@
             text-decoration: none;
             font-weight: 600;
         }
-
-        .signup-prompt a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 
 <body>
     <div class="login-container">
         <div class="login-card">
-            <h2>Log In to Your Account</h2>
-            <p class="subtitle">Quickly access your dashboard and manage your projects.</p>
+            <h2>Buat Akun Baru</h2>
+            <p class="subtitle">Daftar sekarang untuk mulai meminjam buku.</p>
 
-            @if(session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-            @endif
-
-            <form action="{{ url('/login') }}" method="POST">
+            <form action="{{ url('/register') }}" method="POST">
                 @csrf
                 <div class="input-group">
-                    <label for="email">Email Address</label>
+                    <label>Nama Lengkap</label>
                     <div class="input-wrapper">
-                        <i class="fa-regular fa-envelope"></i>
-                        <input type="text" id="email" name="email" placeholder="Email Or NIM" required>
+                        <i class="fa-regular fa-user"></i>
+                        <input type="text" name="nama" placeholder="Masukkan nama lengkap" required>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <div class="label-row">
-                        <label for="password">Password</label>
-                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    <label>Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" name="email" placeholder="email@contoh.com" required>
                     </div>
+                </div>
+
+                <div class="input-group">
+                    <label>NIM</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-id-card"></i>
+                        <input type="text" name="nim" placeholder="NIM Mahasiswa" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Jurusan</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <input type="text" name="jurusan" placeholder="Contoh: Informatika" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Semester</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-list-ol"></i>
+                        <input type="number" name="semester" placeholder="Semester (1-14)" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-lock"></i>
-                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <input type="password" id="password" name="password" placeholder="Minimal 6 Karakter" required>
                         <i class="fa-solid fa-eye toggle-password" id="eyeIcon"></i>
                     </div>
                 </div>
-                <button type="submit" class="login-btn">Login</button>
+
+                <button type="submit" class="login-btn">Buat Akun</button>
             </form>
 
-            <p class="signup-prompt">Don't have an account? <a href="{{ url('/register') }}">Sign Up</a></p>
+            <p class="signup-prompt">Sudah punya akun? <a href="{{ url('/login') }}">Log In</a></p>
         </div>
     </div>
 
@@ -238,16 +210,12 @@
         const eyeIcon = document.getElementById('eyeIcon');
 
         eyeIcon.addEventListener('click', function() {
-            // Cek tipe input saat ini
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-
-            // Ganti ikon mata (eye / eye-slash)
             this.classList.toggle('fa-eye');
             this.classList.toggle('fa-eye-slash');
         });
     </script>
-
 </body>
 
 </html>
