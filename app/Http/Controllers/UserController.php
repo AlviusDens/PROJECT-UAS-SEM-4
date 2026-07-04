@@ -2,60 +2,84 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Models\Users; // Pastikan model sudah diubah namanya menjadi Users.php
-use Illuminate\Support\Facades\Hash;
 
-class UserController extends Controller // Ubah sesuai nama file
+class UserController extends Controller
 {
     public function daftarPengguna()
     {
-        if (session('user_role') !== 'admin') {
-            return redirect('/dashboard')->with('error', 'Hanya admin yang boleh melihat daftar pengguna.');
+        $currentRole = session('user_role');
+
+        if ($currentRole === 'admin') {
+            $users = User::getUsersByRole('petugas');
+            $pageTitle = "Manajemen Akun Petugas (Staf Perpustakaan)";
+            $targetRole = "petugas";
+            $viewPath = "admin.daftar_pengguna";
+        } elseif ($currentRole === 'petugas') {
+            $users = User::getUsersByRole('member');
+            $pageTitle = "Data Keanggotaan Member (Siswa)";
+            $targetRole = "member";
+            $viewPath = "petugas.daftar_pengguna"; 
+        } else {
+            return redirect('/dashboard')->with('error', 'Anda tidak memiliki hak akses ke halaman manajemen ini.');
         }
-        // Gunakan huruf kecil untuk variabel agar standar Laravel ($users)
-        $users = Users::all();
-        return view('daftar_pengguna', compact('users'));
+
+        return view($viewPath, [
+            'users' => $users,
+            'pageTitle' => $pageTitle,
+            'targetRole' => $targetRole
+        ]);
     }
 
-    // Fungsi Tambah Data
     public function store(Request $request)
     {
-        if (session('user_role') !== 'admin') {
-            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk tindakan ini.');
-        }
-        // Validasi sederhana
-        $data = $request->all();
+        $request->validate([
+            'nama'     => 'required',
+            'email'    => 'required|email',
+            'nim'      => 'required',
+            'password' => 'required',
+            'role'     => 'required'
+        ]);
 
-        // Penting: Hash password agar bisa login!
-        if ($request->has('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
+        User::insertUser([
+            'nama'          => $request->nama,
+            'email'         => $request->email,
+            'nim'           => $request->nim,
+            'password'      => $request->password,
+            'role'          => $request->role,
+            'telepon'       => $request->telepon,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'alamat'        => $request->alamat,
+            'created_at'    => now(),
+            'updated_at'    => now()
+        ]);
 
-        Users::create($data); // Ubah dari Pengguna ke Users
-        return redirect()->back()->with('success', 'Data berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Data pengguna baru berhasil didaftarkan!');
     }
 
-    // Fungsi Update Data
     public function update(Request $request, $id)
     {
-        $user = Users::findOrFail($id); // Lebih aman pakai findOrFail
+        $request->validate([
+            'nama' => 'required',
+            'role' => 'required'
+        ]);
 
-        $data = $request->all();
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        } else {
-            unset($data['password']); // Jangan update password jika kosong
-        }
+        User::updateUser($id, [
+            'nama'          => $request->nama,
+            'role'          => $request->role,
+            'telepon'       => $request->telepon,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'alamat'        => $request->alamat,
+            'updated_at'    => now()
+        ]);
 
-        $user->update($data);
-        return redirect()->back()->with('success', 'Data berhasil diubah!');
+        return redirect()->back()->with('success', 'Data pengguna berhasil diperbarui!');
     }
 
-    // Fungsi Hapus Data
     public function destroy($id)
     {
-        Users::destroy($id); // Lebih ringkas daripada where()->delete()
-        return redirect()->back()->with('success', 'Data berhasil dihapus!');
+        User::deleteUser($id);
+        return redirect()->back()->with('success', 'Akun pengguna telah berhasil dihapus!');
     }
 }

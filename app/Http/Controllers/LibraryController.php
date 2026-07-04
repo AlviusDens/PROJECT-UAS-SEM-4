@@ -3,128 +3,162 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Loan;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ReadingMaterial;
 
 class LibraryController extends Controller
 {
     public function index()
     {
-        // Mengambil semua buku dan dikelompokkan berdasarkan kategori
-        $groupedBooks = Book::all()->groupBy('category');
+        $dataBuku = Book::getAllBooks();
+        $groupedBooks = $dataBuku->groupBy('category');
+        $dataBacaan = ReadingMaterial::getAll();
 
-        // Kirim variabel $groupedBooks (sesuai yang diminta oleh View)
-        return view('library', compact('groupedBooks'));
+        $role = session('user_role');
+
+        if (!$role) {
+            return view('guest.library', [
+                'groupedBooks' => $groupedBooks,
+                'readingMaterials' => $dataBacaan
+            ]);
+        } elseif ($role === 'member') {
+            return view('member.library', [
+                'groupedBooks' => $groupedBooks,
+                'readingMaterials' => $dataBacaan
+            ]);
+        } elseif ($role === 'petugas') {
+            return view('petugas.library', [
+                'groupedBooks' => $groupedBooks,
+                'readingMaterials' => $dataBacaan
+            ]);
+        } elseif ($role === 'admin') {
+            return view('admin.library', [
+                'groupedBooks' => $groupedBooks,
+                'readingMaterials' => $dataBacaan
+            ]);
+        }
     }
 
-    // Menambah Buku Baru
     public function store(Request $request)
     {
-        if (session('user_role') !== 'admin') {
+        if (session('user_role') !== 'admin' && session('user_role') !== 'petugas') {
             return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk tindakan ini.');
         }
+
         $request->validate([
             'title'    => 'required',
             'author'   => 'required',
-            'category' => 'required', // Tambahkan ini
-            'image'    => 'image|mimes:jpeg,png,jpg|max:2048'
+            'category' => 'required',
+            'image'    => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'pdf_file' => 'required|mimes:pdf|max:12000'
         ]);
 
-        $data = $request->all();
-
+        $imageName = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('books', 'public');
-            $data['image'] = basename($imagePath);
+            $imageName = basename($imagePath);
         }
 
-        Book::create($data);
-        return redirect()->back()->with('success', 'Buku berhasil ditambahkan!');
-    }
+        $pdfName = null;
+        if ($request->hasFile('pdf_file')) {
+            $pdfPath = $request->file('pdf_file')->store('pdfs', 'public');
+            $pdfName = basename($pdfPath);
+        }
 
-    // Update Data Buku
-    public function update(Request $request, $id)
-    {
-        $book = Book::findOrFail($id);
-
-        $request->validate([
-            'title' => 'required',
-            'author' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg|max:2048'
+        Book::insertBook([
+            'title'     => $request->title,
+            'author'    => $request->author,
+            'category'  => $request->category,
+            'penerbit'  => $request->penerbit,
+            'thn_edisi' => $request->thn_edisi,
+            'sinopsis'  => $request->sinopsis,
+            'image'     => $imageName,
+            'pdf_file'  => $pdfName,
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
 
-        $data = $request->all();
+        return redirect()->back()->with('success', 'Buku digital baru berhasil diterbitkan!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $book = Book::findBookById($id);
+
+        $request->validate([
+            'title'  => 'required',
+            'author' => 'required',
+            'image'  => 'image|mimes:jpeg,png,jpg|max:2048',
+            'pdf_file' => 'mimes:pdf|max:12000'
+        ]);
+
+        $dataUpdate = [
+            'title'     => $request->title,
+            'author'    => $request->author,
+            'category'  => $request->category,
+            'penerbit'  => $request->penerbit,
+            'thn_edisi' => $request->thn_edisi,
+            'sinopsis'  => $request->sinopsis,
+            'updated_at' => now()
+        ];
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
             if ($book->image) {
                 Storage::disk('public')->delete('books/' . $book->image);
             }
             $imagePath = $request->file('image')->store('books', 'public');
-            $data['image'] = basename($imagePath);
+            $dataUpdate['image'] = basename($imagePath);
         }
 
-        $book->update($data);
-        return redirect()->back()->with('success', 'Data buku berhasil diperbarui!');
+        if ($request->hasFile('pdf_file')) {
+            if (isset($book->pdf_file) && $book->pdf_file) {
+                Storage::disk('public')->delete('pdfs/' . $book->pdf_file);
+            }
+            $pdfPath = $request->file('pdf_file')->store('pdfs', 'public');
+            $dataUpdate['pdf_file'] = basename($pdfPath);
+        }
+
+        Book::updateBook($id, $dataUpdate);
+        return redirect()->back()->with('success', 'Data koleksi digital berhasil diperbarui!');
     }
 
-    // Hapus Buku
     public function destroy($id)
     {
-        $book = Book::findOrFail($id);
+        $book = Book::findBookById($id);
         if ($book->image) {
             Storage::disk('public')->delete('books/' . $book->image);
         }
-        $book->delete();
-        return redirect()->back()->with('success', 'Buku berhasil dihapus!');
-    }
-
-    public function borrow(Request $request, $id)
-    {
-        $maxDate = Carbon::now()->addMonth()->format('Y-m-d');
-
-        $request->validate([
-            'due_date' => "required|date|after:today|before_or_equal:$maxDate",
-        ], [
-            'due_date.before_or_equal' => 'Maksimal waktu peminjaman adalah 1 bulan.',
-            'due_date.after' => 'Tanggal pengembalian tidak boleh hari ini atau masa lalu.'
-        ]);
-
-        $book = Book::findOrFail($id);
-
-        if (!$book->is_available) {
-            return back()->with('error', 'Buku ini sedang tidak tersedia.');
+        if (isset($book->pdf_file) && $book->pdf_file) {
+            Storage::disk('public')->delete('pdfs/' . $book->pdf_file);
         }
 
-        Loan::create([
-            'user_id'     => session('user_id'),
-            'book_id'     => $id,
-            'borrowed_at' => now(),
-            'due_date'    => $request->due_date,
-        ]);
-
-        $book->update(['is_available' => false]);
-
-        return redirect()->back()->with('success', 'Buku "' . $book->title . '" berhasil dipinjam!');
+        Book::deleteBook($id);
+        return redirect()->back()->with('success', 'Buku digital berhasil dihapus dari sistem!');
     }
 
-    public function returnBook($id)
+    public function downloadBook($id)
     {
-        // 1. Cari data peminjaman yang sedang aktif untuk buku ini
-        $loan = Loan::where('book_id', $id)->whereNull('returned_at')->first();
+        $book = Book::findBookById($id);
 
-        if ($loan) {
-            // 2. Isi kolom returned_at dengan waktu sekarang
-            $loan->update(['returned_at' => now()]);
-
-            // 3. Ubah status buku menjadi tersedia kembali
-            $loan->book->update(['is_available' => true]);
-
-            return redirect()->back()->with('success', 'Buku berhasil dikembalikan!');
+        if (!$book || !isset($book->pdf_file) || !$book->pdf_file) {
+            return redirect()->back()->with('error', 'Maaf, berkas file PDF untuk buku ini tidak ditemukan di database.');
         }
 
-        return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan.');
+        $pathToFile = storage_path('app/public/pdfs/' . $book->pdf_file);
+
+        if (!file_exists($pathToFile)) {
+            return redirect()->back()->with('error', 'Berkas PDF fisik tidak ditemukan di folder internal server. Coba unggah ulang buku baru.');
+        }
+
+        Book::incrementDownloadCount($id);
+
+        Book::recordDownloadLog([
+            'user_id'       => session('user_id'),
+            'book_id'       => $id,
+            'downloaded_at' => now()
+        ]);
+
+        return response()->download($pathToFile, $book->title . '.pdf');
     }
 }

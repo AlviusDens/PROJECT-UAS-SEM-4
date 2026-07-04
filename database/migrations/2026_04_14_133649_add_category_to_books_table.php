@@ -12,7 +12,6 @@ return new class extends Migration
     public function up()
     {
         Schema::table('books', function (Blueprint $table) {
-            // Kita beri default 'Trending' agar data yang sudah ada tidak error
             $table->string('category')->default('Trending')->after('author');
         });
     }

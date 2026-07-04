@@ -147,7 +147,7 @@
             <h2>Buat Akun Baru</h2>
             <p class="subtitle">Daftar sekarang untuk mulai meminjam buku.</p>
 
-            <form action="{{ url('/register') }}" method="POST">
+            <form action="{{ route('register.store') }}" method="POST">
                 @csrf
                 <div class="input-group">
                     <label>Nama Lengkap</label>
@@ -201,7 +201,7 @@
                 <button type="submit" class="login-btn">Buat Akun</button>
             </form>
 
-            <p class="signup-prompt">Sudah punya akun? <a href="{{ url('/login') }}">Log In</a></p>
+            <p class="signup-prompt">Sudah punya akun? <a href="{{ route('login') }}">Log In</a></p>
         </div>
     </div>
 

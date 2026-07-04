@@ -15,9 +15,7 @@ class CheckLogin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Cek apakah ada tanda 'is_logged_in' di session
         if (!session('is_logged_in')) {
-            // Jika tidak ada, tendang balik ke halaman login
             return redirect('/login')->with('error', 'Silakan login terlebih dahulu!');
         }
 

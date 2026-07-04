@@ -12,11 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('loans', function (Blueprint $table) {
-            $table->id(); // Ini adalah primary key (otomatis bernama 'id')
-
-            // Pastikan di sini namanya 'user_id', bukan 'id'
+            $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-
             $table->foreignId('book_id')->constrained()->onDelete('cascade');
             $table->date('borrowed_at');
             $table->date('due_date');

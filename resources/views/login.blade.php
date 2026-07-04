@@ -205,7 +205,7 @@
             </div>
             @endif
 
-            <form action="{{ url('/login') }}" method="POST">
+            <form action="{{ route('login.authenticate') }}" method="POST">
                 @csrf
                 <div class="input-group">
                     <label for="email">Email Address</label>
@@ -229,10 +229,10 @@
                 <button type="submit" class="login-btn">Login</button>
             </form>
 
-            <p class="signup-prompt">Don't have an account? <a href="{{ url('/register') }}">Sign Up</a></p>
+            <p class="signup-prompt">Don't have an account? <a href="{{ route('register') }}">Sign Up</a></p>
         </div>
     </div>
-
+    
     <script>
         const passwordInput = document.getElementById('password');
         const eyeIcon = document.getElementById('eyeIcon');
